@@ -161,3 +161,54 @@ Condición de entrada: el Caso B reproducido en casa por el instrumento
 - PRE-VUELO A2.1 sobre esta tupla: RC 0 (blob previo
   `e69de29bb2d1d6434b8b29ae775ad8c2e48c5391`, líneas previas 0).
 - Escritura única. Post-verificación (líneas, bytes y blob) en el pie del commit.
+
+## §7.7.a Adenda de Retractación y Asiento de Solver (2026-10-12T16:38:42Z)
+
+UNIVERSO DECLARADO: el árbol `~/acustica-monotile` en `HEAD = d5a7548` y las piezas que esta adenda cita; MOTOR = `git hash-object` · `wc -l` · `wc -c` · `git log` · `python3 -B sim/sim_acustica2d.py`; UNIDAD = línea · byte · blob · corrida; VENTANA = reloj UTC de esta cabecera. **No se edita ni se borra ninguna línea anterior** (§7.8): esta adenda sólo agrega.
+
+### §7.7.a.1 Retractación de la fila 7 de §7
+
+La fila 7 de §7 dice: «**Nada del solver acústico queda sellado**: `sim_acustica2d.py` **no existe todavía** en esta casa.» Queda **RETRACTADA por hecho del disco**, sin tocarla: era verdadera hasta la semilla y falsa desde `cad029a`. La línea original se conserva intacta, como su contrato manda.
+
+- Semilla: `fc82307` = `fc823076b00b27efb38961146a62cec586039598` (`init: anclar semilla vacia sim_acustica2d.py`), blob `e69de29bb2d1d6434b8b29ae775ad8c2e48c5391`, 0 líneas / 0 bytes. Gate de esa escritura: RC 0 a las `2026-10-12T07:21:49Z`.
+
+### §7.7.a.2 Linaje del solver y el defecto que sólo la corrida cazó
+
+| rev | commit | blob (16 hex) | líneas | bytes | qué cambió |
+|---|---|---|---|---|---|
+| v1 | `cad029a` | `8fc9222ec74efcd2` | 542 | 24944 | primera versión: lazo Maxwell 2D TM literal, `inv_eps = K`, `inv_mu = 1` fijo |
+| v2 | `b9038c5` | `7ba083989a467f13` | 549 | 25371 | fuera la línea muerta `A1 = float(np.float64(0.0)) * 0.0` y la clave `_marcador`; entra la guarda del lazo |
+| v3 | `bb1177b` | `c7688c7dbdeccd49` | 551 | 25538 | **indexación del término en y**: `vy[:, :-1]` → `vy[1:, :-1]` |
+
+- Guarda del lazo (v2), literal: `assert INV_MU == 1.0 and bool(np.all(inv_eps == K))`.
+- El defecto de v2 **no era legible en reposo**: la corrida murió con `ValueError: operands could not be broadcast together with shapes (383,383) (384,383)`. El vecino `fdtd2m_tm.py` (blob `0d7820a8ea566e40`) usa `hx[1:, :-1]` en esa línea.
+- Gate de la reparación v2→v3: `BLOB_PRE = 7ba083989a467f133a3930f0bed6fc3f8a0f4ab7`, `LINEAS_PRE = 549`, huella `vy[1:, 1:] - vy[1:, :-1]` ⇒ RC 0 a las `2026-10-12T07:29:41Z`.
+- Control independiente de que v3 es la forma **consistente** y no un parche que sólo compila: el error de fase medido queda a `0.96`× y `1.05`× del error analítico de dispersión de Yee en la ventana (`1.463133e-03`, `FACTOR_Q4 = 3.0`).
+
+### §7.7.a.3 Piso de ruido de C1, medido
+
+UNIVERSO DECLARADO: las 4 corridas de un crudo; MOTOR = `python3 -B sim/sim_acustica2d.py` (numpy, `np.fft`); UNIDAD = rizado de transmitancia adimensional; VENTANA = `2026-10-12T07:29:53Z` → `2026-10-12T07:30:19Z` (26.374 s de reloj).
+
+| corrida | malla | s | T_media | T_teorico | T_riz | cola_sonda | fase_max |
+|---|---|---|---|---|---|---|---|
+| C1a 24a | 384x1 | 0.05 | 0.9999071789731048 | 1.0 | 0.005394204639334759 | 0.002784078634789628 | 0.0014045811674006092 |
+| C1a 36a | 576x1 | 0.05 | 1.0000553614091023 | 1.0 | 0.004896082438906549 | 0.0026356556228717205 | 0.0013902681561519525 |
+| C1b 24a | 384x384 | 6.8 | 0.707449275919397 | 0.7071067811865476 | 0.00552322568652841 | 0.022825810366877947 | 0.001535299592816397 |
+| C1b 36a | 576x576 | 19.17 | 0.7072226761898761 | 0.7071067811865476 | 0.0044667919095235376 | 0.022825810375721022 | 0.0015219279413155595 |
+
+- **Piso nativo medido**: `PISO_DE_RUIDO_riz_T_max = 0.00552322568652841` (0.55 %). `identidad_inv_eps_en_todas_las_corridas = True` en las cuatro configuraciones.
+- `T_media` reproduce `1.000000` (C1a) y `sqrt(8/16) = 0.7071068` (C1b) hasta la tercera cifra: la sonda a distancia absoluta `16a` no cambia con `L` (`pico_sonda` idéntico por modo).
+- `riz(lnA) = 0.384547 / 0.384425` **no es ruido**: es la ley cilíndrica `r^(-1/2)` leída en `r_2 = 2 r_1` (teórico `1/sqrt(2) = 0.7071068`; medido `0.707449 / 0.707223`). En `ln A` el factor entra como offset constante y el rizado de `T` lo cancela ⇒ **diagnóstico, no piso**.
+- Crudo: `crudos/crudo_C1_acustica_20261012T072953Z.json` y `.txt`, sha16 `f8bf85b2370e4d50` / `f21aec4d0229dbc5`, commit `d5a75488d2b8c5f601f7a6c1d4be7d6c22cc4b18`; `sha16_script = 84721caf685985b3`.
+- **Abierto, sin adjudicar** (ningún umbral de este crudo lo cubre): `cola_dominio` de C1b crece con el dominio (`7.727917669443574e-03` en 24a → `3.292129244455513e-02` en 36a) y el máximo final de C1b 36a cae en la celda `(552, 48)` = `+32.50 a` del manantial, borde externo de la PML. Se declara, no se adjudica.
+
+### §7.7.a.4 Techo nativo (primero de esta casa)
+
+- `riz(T) <= 0.010` — techo de rizado admisible para este instrumento, declarado sobre el piso medido. Aritmética declarada: `0.010 / 0.00552322568652841 = 1.8105`× (la orden lo enunció como «factor 2× sobre 0.0055»; el factor exacto sobre el piso medido es 1.81×, y así se sella).
+- Regla que viaja con él: un contraste posterior de `K` heterogéneo **sólo** cuenta si su variación respecto al fondo **supera 0.55 %**.
+- `ANALOGO_PRESTADO_Q1..Q4` (umbral `0.05`, `FACTOR_Q4 = 3.0`) siguen siendo **prestados de `fotonica-monotile`**: referencia provisional, **no** sellos de esta casa. El único sello nativo es el techo de arriba.
+
+### §7.7.a.5 Bitácora de esta adenda
+
+- Gate A2.1 sobre esta tupla: `TARGET` = este archivo, `BLOB_PRE = 5753f973608d41d60e5d269275e5b06891ce97bf`, `LINEAS_PRE = 163`, huella `Adenda de Retractación y Asiento de Solver` (la cabecera sin su nivel markdown) ⇒ **RC 0** a las `16:13:50Z`.
+- Escritura única y aditiva; §0–§9 intactos. Post-verificación (líneas, bytes, blob, `^#+`, `§7`) en el cuerpo del commit.
