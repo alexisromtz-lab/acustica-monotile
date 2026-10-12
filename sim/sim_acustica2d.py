@@ -95,6 +95,18 @@ REGLA DURA
 Uso:
   python3 -B sim/sim_acustica2d.py
   python3 -B sim/sim_acustica2d.py --json
+
+CAPACIDAD NUEVA (Paso 3 del enlace fotonica-monotile -> acustica-monotile)
+  `correr(L_a, modo, mascara=None)`. Con `mascara` binaria (n, n) cargada de la
+  custodia (`data/geometria_hat/<realizacion>/malla_{u1,u2}_n<N>_k2.npy`, commit
+  b498fcf) el modulo local pasa a ser K(x,y) = K_fondo + (K_mat - K_fondo) m(x,y)
+  con K_fondo = 1.0 y K_mat = 0.25, y el resto del reparto intacto: eps = 1/K,
+  inv_mu = 1.0 en toda la malla. La mascara se TRANSPONE al cargarla (el vecino
+  indexa fila = y, columna = x; este solver indexa eje 0 = x, eje 1 = y) y el
+  crudo imprime el par de control de esa convencion.
+  Con `mascara=None` el solver es el de C1 y no se movio un bit: el nulo del
+  instrumento no cambia al ganar la capacidad (se comprueba re-corriendo C1b a
+  L = 24a contra el crudo commit `d5a7548`).
 """
 from __future__ import annotations
 
@@ -140,6 +152,15 @@ UMBRAL_PRESTADO = 0.05       # PRESTADO de la casa vecina; NO sellado en esta ca
 
 AQUI = Path(__file__).resolve().parent
 CRUDOS = AQUI.parent / "crudos"
+GEO = AQUI.parent / "data" / "geometria_hat"     # custodia del enlace (Paso 1/2)
+REALIZACIONES = (
+    "u1",
+    "u2_semilla_101",
+    "u2_semilla_102",
+    "u2_semilla_103",
+    "u2_semilla_104",
+    "u2_semilla_105",
+)
 
 UNIVERSO = (
     "unidades normalizadas a=1, c_s=1, rho_0=1, K_0=1; nu = omega a/(2 pi c_s); "
@@ -212,21 +233,68 @@ def yee_error_fase(nu: np.ndarray) -> np.ndarray:
     return vp / C - 1.0
 
 
-def correr(L_a: float, modo: str) -> dict:
+# MAPEO CONSTITUTIVO CASO B: HETEROGENEIDAD K(x,y) DESDE MASCARA BINARIA
+# (Paso 3 del protocolo de enlace fotonica-monotile -> acustica-monotile.)
+# La mascara binaria m(x,y) vive bajo custodia en data/geometria_hat/ (Paso 1/2,
+# commit b498fcf) con su CUSTODIA_SHA256.txt; el mapeo es el del reparto
+# congelado (§3/§4, Caso B) y NO toca el resto de la actualizacion:
+#     K(x,y) = K_fondo + (K_mat - K_fondo) * m(x,y)    K_fondo=1.0  K_mat=0.25
+#     eps = 1/K        inv_eps = 1/eps        inv_mu = 1.0 en toda la malla
+# Con K en {1.0, 0.25} los dos reciprocos son EXACTOS (1/1.0 y 1/0.25), luego la
+# identidad inv_eps == K es bit-exacta (negativo declarado, §7.3: vale para K
+# reciproco exacto, no para un K arbitrario).
+# CONVENCION DE EJES (declarada; medida en el vecino `malla_hat.py:513-544`):
+#   rasterizar() devuelve union[i, j] con i = indice de y (filas, de py) y j =
+#   indice de x (columnas, de px), porque meshgrid(xs, ys) pone la fila en y y
+#   los margenes i0/i1 salen de py con j0/j1 de px. Este solver indexa K[i, j]
+#   con i = x (eje 0) y j = y (eje 1). Luego m se TRANSPONE al cargar.
+#   Control en el crudo: union.T != union. La transposicion NO es un no-op: no
+#   se puede elegir la convencion sin declararla.
+def cargar_mascara(realizacion: str, n: int) -> np.ndarray:
+    """Mascara binaria bajo custodia -> float (n, n) ya en ejes del solver."""
+    nombre = "u1" if realizacion == "u1" else "u2"
+    ruta = GEO / realizacion / f"malla_{nombre}_n{n}_k2.npy"
+    if not ruta.is_file():
+        raise SystemExit(f"mascara ausente bajo custodia: {ruta}")
+    m = np.load(ruta)
+    if m.shape != (n, n):
+        raise SystemExit(f"{ruta.name}: forma {m.shape}, se esperaba ({n}, {n})")
+    if not bool(np.all((m == 0) | (m == 1))):
+        raise SystemExit(f"{ruta.name}: la mascara no es binaria")
+    return np.ascontiguousarray(m.T, dtype=np.float64)
+
+
+def correr(L_a: float, modo: str, mascara: np.ndarray | None = None) -> dict:
     nx = int(round(L_a / DX))
     ny = 1 if modo == "C1a" else nx
-    K = np.full((nx, ny), K_C1, dtype=np.float64)  # modulo elastico local (C1: homogeneo)
+    if mascara is None:
+        K = np.full((nx, ny), K_C1, dtype=np.float64)  # C1: homogeneo (nulo)
+        es_heterogeneo = False
+        fraccion_mascara = None
+    else:
+        # heterogeneidad K(x,y): ver el bloque "mapeo constitutivo" de arriba
+        m = np.asarray(mascara, dtype=np.float64)
+        if m.shape != (nx, ny):
+            raise SystemExit(
+                f"mascara {m.shape} no casa con la malla ({nx}, {ny}) de L={L_a:g}a"
+            )
+        K = K_FONDO + (K_MAT - K_FONDO) * m
+        es_heterogeneo = True
+        fraccion_mascara = float(m.mean())
     eps = 1.0 / K                                  # UNICO arreglo constitutivo
     inv_eps = 1.0 / eps                            # = K por la via del codigo
+    inv_mu = np.full((nx, ny), INV_MU, dtype=np.float64)   # mu = rho = 1 fijo
     identidad_inv_eps = bool(np.all(inv_eps == K))
+    identidad_inv_mu = bool(np.all(inv_mu == INV_MU))
 
     # GUARDA DEL LAZO: el mapeo exige inv_mu = 1.0 fijo e inv_eps = K. Un gate sin
     # assert detras informa, no protege: si el reparto constitutivo se moviera, C1
     # seguiria imprimiendo cifras y el crudo saldria "verde" por el motivo
     # equivocado. Se declara que bajo python3 -O este assert desaparece: por eso la
     # comprobacion se exporta ademas como identidad_inv_eps_igual_a_K.
-    assert INV_MU == 1.0 and bool(np.all(inv_eps == K)), (
-        "el lazo exige inv_mu = 1.0 fijo e inv_eps = K (Caso B, pre-registro 4)"
+    assert (INV_MU == 1.0 and identidad_inv_eps and identidad_inv_mu), (
+        "el lazo exige inv_mu = 1.0 en toda la malla e inv_eps = K "
+        "(Caso B, pre-registro §4)"
     )
     nt = int(round(T_TOTAL / DT))
     jc = ny // 2
@@ -328,7 +396,14 @@ def correr(L_a: float, modo: str) -> dict:
         "ny": ny,
         "nt": nt,
         "K_C1": K_C1,
+        "es_heterogeneo": es_heterogeneo,
+        "fraccion_mascara_union": fraccion_mascara,
+        "K_min": float(K.min()),
+        "K_max": float(K.max()),
+        "inv_eps_min": float(inv_eps.min()),
+        "inv_eps_max": float(inv_eps.max()),
         "identidad_inv_eps_igual_a_K": identidad_inv_eps,
+        "identidad_inv_mu_igual_a_uno": identidad_inv_mu,
         "segundos_corrida": round(transcurrido, 2),
         "nu": nu.tolist(),
         "A_d_1": Amp[0].tolist(),
