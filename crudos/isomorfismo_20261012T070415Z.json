@@ -1,0 +1,108 @@
+{
+  "t_utc": "2026-10-12T07:04:15Z",
+  "n": 32,
+  "semilla": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+  "filas": [
+    {
+      "p": 0.0,
+      "vx": 0.0,
+      "vy": 0.0,
+      "medio": "uniforme (rho=1, K=1)",
+      "fila": "B_ratificado",
+      "asignacion": "B_ratificado"
+    },
+    {
+      "p": 0.0,
+      "vx": 0.0,
+      "vy": 0.0,
+      "medio": "uniforme (rho=1, K=1)",
+      "fila": "A_invertido_alfa1",
+      "asignacion": "A_invertido"
+    },
+    {
+      "p": 0.0,
+      "vx": 0.0,
+      "vy": 0.0,
+      "medio": "uniforme (rho=1, K=1)",
+      "fila": "A_invertido_alfa_eps_mu",
+      "asignacion": "A_invertido"
+    },
+    {
+      "p": 0.3333333333333333,
+      "vx": 0.0,
+      "vy": 0.0,
+      "medio": "uniforme (rho=1, K=1)",
+      "fila": "CONTROL_positivo_B_x1.5",
+      "asignacion": "B_control_x1.5"
+    },
+    {
+      "p": 9.04100923818876,
+      "vx": 0.7499999999999991,
+      "vy": 0.75,
+      "medio": "densimetrico (rho 1->4, K=1)",
+      "fila": "B_ratificado",
+      "asignacion": "B_ratificado"
+    },
+    {
+      "p": 0.7499999999999991,
+      "vx": 0.7499999999999991,
+      "vy": 0.75,
+      "medio": "densimetrico (rho 1->4, K=1)",
+      "fila": "A_invertido_alfa1",
+      "asignacion": "A_invertido"
+    },
+    {
+      "p": 7.688746343224505,
+      "vx": 3.749999999999996,
+      "vy": 3.75,
+      "medio": "densimetrico (rho 1->4, K=1)",
+      "fila": "A_invertido_alfa_eps_mu",
+      "asignacion": "A_invertido"
+    },
+    {
+      "p": 0.3333333333333333,
+      "vx": 0.0,
+      "vy": 0.0,
+      "medio": "densimetrico (rho 1->4, K=1)",
+      "fila": "CONTROL_positivo_B_x1.5",
+      "asignacion": "B_control_x1.5"
+    },
+    {
+      "p": 1.9221865858061262,
+      "vx": 0.7499999999999991,
+      "vy": 0.75,
+      "medio": "modulo (rho=1, K 1->0.25)",
+      "fila": "B_ratificado",
+      "asignacion": "B_ratificado"
+    },
+    {
+      "p": 0.7499999999999991,
+      "vx": 0.7499999999999991,
+      "vy": 0.75,
+      "medio": "modulo (rho=1, K 1->0.25)",
+      "fila": "A_invertido_alfa1",
+      "asignacion": "A_invertido"
+    },
+    {
+      "p": 1.9221865858061262,
+      "vx": 0.937499999999999,
+      "vy": 0.9375,
+      "medio": "modulo (rho=1, K 1->0.25)",
+      "fila": "A_invertido_alfa_eps_mu",
+      "asignacion": "A_invertido"
+    },
+    {
+      "p": 0.3333333333333333,
+      "vx": 0.0,
+      "vy": 0.0,
+      "medio": "modulo (rho=1, K 1->0.25)",
+      "fila": "CONTROL_positivo_B_x1.5",
+      "asignacion": "B_control_x1.5"
+    }
+  ],
+  "B_todo_cero": false,
+  "control_positivo_min": 0.0,
+  "homogeneo_todo_cero": false,
+  "veredicto": "ROJO: el control positivo no discrimina => el instrumento no mide",
+  "rc": 2
+}
