@@ -98,14 +98,27 @@ def medios(n):
     ]
 
 
+def alfa_de_fila(etiqueta, rho, K):
+    """alfa = mu/rho que EXIGE la fila. Es un dato de la fila, no un parametro
+    suelto: la primera version de este instrumento le paso a la fila B el alfa de
+    la fila A, y su propia corrida (07:04:15Z) salio ROJO por ese defecto --del
+    metro, no del objeto. Se conserva el crudo de esa corrida como foto previa."""
+    if etiqueta == "B_ratificado":
+        return 1.0                          # mu/rho = rho/rho
+    if etiqueta == "A_invertido_alfa1":
+        return 1.0
+    if etiqueta == "A_invertido_alfa_eps_mu":
+        return (1.0 / K) / rho              # eps/mu del contrato invertido
+    raise ValueError(etiqueta)
+
+
 def corre():
     filas = []
-    for nombre, rho, K, alfa in medios(N):
+    for nombre, rho, K, alfa0 in medios(N):
         for etiqueta, asignacion in (("B_ratificado", "B_ratificado"),
                                      ("A_invertido_alfa1", "A_invertido"),
                                      ("A_invertido_alfa_eps_mu", "A_invertido")):
-            a = alfa if etiqueta == "A_invertido_alfa1" else (1.0 / K) / rho
-            r = residuo_del_mapeo(rho, K, asignacion, a)
+            r = residuo_del_mapeo(rho, K, asignacion, alfa_de_fila(etiqueta, rho, K))
             r.update({"medio": nombre, "fila": etiqueta, "asignacion": asignacion})
             filas.append(r)
         r = residuo_del_mapeo(rho, K, "B_control_x1.5", 1.0)
@@ -127,15 +140,18 @@ def main():
     B_todo_cero = all((x is not None and x == 0.0) for x in todos_B)
 
     ctrl = [f[k] for f in filas if f["asignacion"] == "B_control_x1.5" for k in ("p", "vx", "vy")]
-    ctrl_min = min(ctrl)
+    ctrl_max = max(ctrl)   # el control planta el defecto en UNA ecuacion (p): lo que
+                           # debe ser > 0 es el MAXIMO. Con min() el propio control
+                           # salia negro y el instrumento se declaraba roto (07:04:15Z).
 
-    homogeneo = [f for f in filas if f["medio"].startswith("uniforme")]
+    homogeneo = [f for f in filas
+                 if f["medio"].startswith("uniforme") and f["asignacion"] != "B_control_x1.5"]
     hom_todo_cero = all((f[k] is not None and f[k] == 0.0) for f in homogeneo for k in ("p", "vx", "vy"))
 
-    if B_todo_cero and ctrl_min > 0.0:
+    if B_todo_cero and ctrl_max > 0.0:
         veredicto = "VERDE"
         rc = 0
-    elif ctrl_min <= 0.0:
+    elif ctrl_max <= 0.0:
         veredicto = "ROJO: el control positivo no discrimina => el instrumento no mide"
         rc = 2
     else:
@@ -154,7 +170,7 @@ def main():
         lineas.append("%-32s | %-22s | %s | %s | %s"
                       % (f["medio"], f["fila"], fmt(f["p"]), fmt(f["vx"]), fmt(f["vy"])))
     lineas.append("CASO_B_exacto_en_los_tres_medios_y_las_tres_ecuaciones = %s" % B_todo_cero)
-    lineas.append("CONTROL_POSITIVO_min = %s  (>0 exige que el instrumento discrimine)" % fmt(ctrl_min))
+    lineas.append("CONTROL_POSITIVO_max = %s  (>0 exige que el instrumento discrimine)" % fmt(ctrl_max))
     lineas.append("MEDIO_HOMOGENEO_todo_cero = %s  (por eso el medio homogeneo NO decide: "
                   "las tres asignaciones coinciden)" % hom_todo_cero)
     lineas.append("VEREDICTO=%s" % veredicto)
@@ -168,7 +184,7 @@ def main():
         fh.write(texto)
     with open(os.path.join(out, "isomorfismo_%s.json" % sello), "w", encoding="utf-8") as fh:
         json.dump({"t_utc": t0, "n": N, "semilla": BLOB_SEMILLA, "filas": filas,
-                   "B_todo_cero": B_todo_cero, "control_positivo_min": ctrl_min,
+                   "B_todo_cero": B_todo_cero, "control_positivo_max": ctrl_max,
                    "homogeneo_todo_cero": hom_todo_cero, "veredicto": veredicto, "rc": rc},
                   fh, ensure_ascii=False, indent=2)
 

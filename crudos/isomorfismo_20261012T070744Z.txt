@@ -1,0 +1,21 @@
+T_UTC=2026-10-12T07:07:44Z
+UNIVERSO DECLARADO: 1 modo de Fourier de 32x32 celdas, 12 filas = 3 medios x (B_ratificado + 2 filas del contrato invertido) + 3 controles positivos; MOTOR = numpy np.roll sin avanzar el tiempo; UNIDAD = residuo relativo por ecuacion (p, vx, vy); VENTANA = T_UTC de arriba.
+SEMILLA del instrumento = e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+medio | fila | res_p | res_vx | res_vy
+uniforme (rho=1, K=1)            | B_ratificado           | 0.000000e+00 | 0.000000e+00 | 0.000000e+00
+uniforme (rho=1, K=1)            | A_invertido_alfa1      | 0.000000e+00 | 0.000000e+00 | 0.000000e+00
+uniforme (rho=1, K=1)            | A_invertido_alfa_eps_mu | 0.000000e+00 | 0.000000e+00 | 0.000000e+00
+uniforme (rho=1, K=1)            | CONTROL_positivo_B_x1.5 | 3.333333e-01 | 0.000000e+00 | 0.000000e+00
+densimetrico (rho 1->4, K=1)     | B_ratificado           | 0.000000e+00 | 0.000000e+00 | 0.000000e+00
+densimetrico (rho 1->4, K=1)     | A_invertido_alfa1      | 7.500000e-01 | 7.500000e-01 | 7.500000e-01
+densimetrico (rho 1->4, K=1)     | A_invertido_alfa_eps_mu | 7.688746e+00 | 3.750000e+00 | 3.750000e+00
+densimetrico (rho 1->4, K=1)     | CONTROL_positivo_B_x1.5 | 3.333333e-01 | 0.000000e+00 | 0.000000e+00
+modulo (rho=1, K 1->0.25)        | B_ratificado           | 0.000000e+00 | 0.000000e+00 | 0.000000e+00
+modulo (rho=1, K 1->0.25)        | A_invertido_alfa1      | 7.500000e-01 | 7.500000e-01 | 7.500000e-01
+modulo (rho=1, K 1->0.25)        | A_invertido_alfa_eps_mu | 1.922187e+00 | 9.375000e-01 | 9.375000e-01
+modulo (rho=1, K 1->0.25)        | CONTROL_positivo_B_x1.5 | 3.333333e-01 | 0.000000e+00 | 0.000000e+00
+CASO_B_exacto_en_los_tres_medios_y_las_tres_ecuaciones = True
+CONTROL_POSITIVO_max = 3.333333e-01  (>0 exige que el instrumento discrimine)
+MEDIO_HOMOGENEO_todo_cero = True  (por eso el medio homogeneo NO decide: las tres asignaciones coinciden)
+VEREDICTO=VERDE
+RC=0
