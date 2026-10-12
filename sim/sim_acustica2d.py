@@ -219,6 +219,15 @@ def correr(L_a: float, modo: str) -> dict:
     eps = 1.0 / K                                  # UNICO arreglo constitutivo
     inv_eps = 1.0 / eps                            # = K por la via del codigo
     identidad_inv_eps = bool(np.all(inv_eps == K))
+
+    # GUARDA DEL LAZO: el mapeo exige inv_mu = 1.0 fijo e inv_eps = K. Un gate sin
+    # assert detras informa, no protege: si el reparto constitutivo se moviera, C1
+    # seguiria imprimiendo cifras y el crudo saldria "verde" por el motivo
+    # equivocado. Se declara que bajo python3 -O este assert desaparece: por eso la
+    # comprobacion se exporta ademas como identidad_inv_eps_igual_a_K.
+    assert INV_MU == 1.0 and bool(np.all(inv_eps == K)), (
+        "el lazo exige inv_mu = 1.0 fijo e inv_eps = K (Caso B, pre-registro 4)"
+    )
     nt = int(round(T_TOTAL / DT))
     jc = ny // 2
     idx = [I_FUENTE + int(round(d / DX)) for d in D_SONDAS]
@@ -309,7 +318,6 @@ def correr(L_a: float, modo: str) -> dict:
     T_teorico = 1.0 if modo == "C1a" else math.sqrt(D_SONDAS[0] / D_SONDAS[1])
     T = Amp[1] / np.maximum(Amp[0], 1e-300)
     ln_T = np.log(T)
-    A1 = float(np.float64(0.0)) * 0.0  # marcador sin uso: se conserva la forma del vecino
 
     return {
         "modo": modo,
@@ -346,7 +354,6 @@ def correr(L_a: float, modo: str) -> dict:
         "cola_final": cola_fin,
         "residuo_media_p": media_int,
         "pico_sonda": pico2,
-        "_marcador": A1,
     }
 
 
