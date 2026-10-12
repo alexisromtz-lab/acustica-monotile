@@ -1,0 +1,80 @@
+UNIVERSO DECLARADO: unidades normalizadas a=1, c_s=1, rho_0=1, K_0=1; nu = omega a/(2 pi c_s); malla Yee (p,vx,vy) dx=dy=a/16 (0.0625); Courant S=0.5 (limite 2D 0.7071); PML campo partido 20 celdas/borde, sigma_max = -(orden+1)c ln(R0)/(2d) con orden=3, R0=1e-06, d=1.25 a; fuente = pulso gaussiano sigma=0.5 a/c_s, t0=1.5 a/c_s, termino blando puntual en la ecuacion de p en (i=32, j=central); sondas en posicion ABSOLUTA d=8a y d=16a; L en 24a y 36a; ventana nu en [0.15, 0.55] (el borde bajo lo fija que la sonda cercana quede a >= 1 lambda: 1/0.15 = 6.67 a); T_total=72.0 a/c_s, Nt=2304, dnu=0.0139; umbral de planitud = 0.05 sobre T = A(16a)/A(8a) de la MISMA corrida (PRESTADO de la casa vecina, NO sellado aqui); cola de sonda desde t >= 24 a/c_s y residuo de dominio desde t >= 42 a/c_s medido SOLO en el interior fisico (celdas de la PML excluidas: ahi el maximo es la onda incidente entrando al absorbente, no un residuo); doble precision; medio HOMOGENEO K=1, rho=1 -> c_s=1 (NO hay objeto en C1); motor numpy; unidad de conteo = celda; dos sub-corridas: C1a = cuasi-1D (ny=1, PML solo en x, onda plana -> aqui vive la dispersion numerica, comparable EXACTA con la formula de Yee) y C1b = 2D real (ny=nx, PML en los cuatro bordes, fuente puntual -> aqui viven el reparto cilindrico y la dependencia espuria con L)
+instrumento: acustica-monotile/sim/sim_acustica2d.py · sha16 84721caf685985b3
+mapa: Caso B: eps = 1/K, mu = rho = 1, alfa = 1, v = (-Hy, Hx)
+t_utc: 2026-10-12T07:29:53Z -> 2026-10-12T07:30:19Z
+umbral de planitud: 0.05 · origen: PRESTADO de fotonica-monotile/PREREGISTRO_INSTRUMENTO_FDTD_20261012.md §3/§6; NO sellado en esta casa
+factor Q4: 3.0
+reparto congelado: rho_0=1 K_0=1 c_s_0=1 Z_0=1 · inclusion declarada (no usada en C1): K_mat=0.25 eps_mat=4 c_s_mat=0.5 Z_mat=0.5 · INV_MU=1 fijo
+
+---- C1 · homogeneo K = 1 (NO hay objeto) ----
+C1a · L = 24a · malla 384x1 · 2304 pasos · 0.05 s
+   T(nu) = A(16a)/A(8a) = 0.999907  (teorico 1.000000, desv max 0.005475, rango 0.994525..1.004442)
+   riz de T = 0.005394   [diagnostico] riz de ln A(d=8a) = 0.006655 · riz de ln A(d=16a) = 0.006874
+   fase: error max = 1.404581e-03  ·  rama m = 1
+   cola de sonda (t >= 24 a/c_s) = 2.784e-03  ·  residuo de dominio interior (t >= 42 a/c_s) = 2.780e-03
+   residuo localizado: celda (48, 0) en n = 1369 (t = 42.78 a/c_s) · maximo final = 2.841e-04 en celda (74, 0) (x respecto a la fuente = +2.62 a) · media espacial de p en el interior = -3.190e-07
+C1a · L = 36a · malla 576x1 · 2304 pasos · 0.05 s
+   T(nu) = A(16a)/A(8a) = 1.000055  (teorico 1.000000, desv max 0.004831, rango 0.995169..1.004453)
+   riz de T = 0.004896   [diagnostico] riz de ln A(d=8a) = 0.006520 · riz de ln A(d=16a) = 0.005629
+   fase: error max = 1.390268e-03  ·  rama m = 1
+   cola de sonda (t >= 24 a/c_s) = 2.636e-03  ·  residuo de dominio interior (t >= 42 a/c_s) = 2.727e-03
+   residuo localizado: celda (443, 0) en n = 1346 (t = 42.06 a/c_s) · maximo final = 2.877e-04 en celda (74, 0) (x respecto a la fuente = +2.62 a) · media espacial de p en el interior = +5.379e-07
+C1b · L = 24a · malla 384x384 · 2304 pasos · 6.8 s
+   T(nu) = A(16a)/A(8a) = 0.707449  (teorico 0.707107, desv max 0.004259, rango 0.704648..0.711365)
+   riz de T = 0.005523   [diagnostico] riz de ln A(d=8a) = 0.383581 · riz de ln A(d=16a) = 0.384547
+   fase: error max = 1.535300e-03  ·  rama m = 1
+   cola de sonda (t >= 24 a/c_s) = 2.283e-02  ·  residuo de dominio interior (t >= 42 a/c_s) = 7.728e-03
+   residuo localizado: celda (357, 28) en n = 1344 (t = 42.00 a/c_s) · maximo final = 2.522e-03 en celda (51, 38) (x respecto a la fuente = +1.19 a) · media espacial de p en el interior = -8.242e-04
+C1b · L = 36a · malla 576x576 · 2304 pasos · 19.17 s
+   T(nu) = A(16a)/A(8a) = 0.707223  (teorico 0.707107, desv max 0.003152, rango 0.704069..0.710259)
+   riz de T = 0.004467   [diagnostico] riz de ln A(d=8a) = 0.381396 · riz de ln A(d=16a) = 0.384425
+   fase: error max = 1.521928e-03  ·  rama m = 1
+   cola de sonda (t >= 24 a/c_s) = 2.283e-02  ·  residuo de dominio interior (t >= 42 a/c_s) = 3.292e-02
+   residuo localizado: celda (555, 20) en n = 1344 (t = 42.00 a/c_s) · maximo final = 2.899e-03 en celda (552, 48) (x respecto a la fuente = +32.50 a) · media espacial de p en el interior = -9.180e-04
+
+delta(C1a) = max_nu |ln A(36a) - ln A(24a)| = 0.004548
+delta(C1b) = max_nu |ln A(36a) - ln A(24a)| = 0.006001
+complemento analitico Yee: error de fase max en la ventana = 1.463133e-03
+
+PISO DE RUIDO MEDIDO: riz(T) max = 0.005523  ·  riz(ln A) max (diagnostico, NO es piso: lleva la ley 2D) = 0.384547
+
+---- ANALOGO PRESTADO de la casa vecina (§6 de su pre-registro) ----
+     NO son sellos de esta casa: el sello de acustica pide el NULO
+     (piso de ruido) y ese piso es la cifra riz(T) de arriba.
+Q1 riz(T) <= 0.05 en C1a y C1b: VERDE  [C1a 0.005394 · C1b 0.005523]
+Q2 delta <= 0.05: VERDE
+Q3 T (2D 0.7071 · 1D 1.0000) +- 0.05: VERDE
+Q4 fase medida 1.405e-03 <= 3 x Yee 1.463e-03 = 4.389e-03: VERDE
+
+identidad inv_eps == K en la malla de C1 (K=1): True  [pre-registro §7.3: bit-exacta solo para K reciproco exacto]
+
+---- ventana: nu · A_C1a(8a) · A_C1a(16a) · A_C1b(8a) · A_C1b(16a) ----
+  0.1527  1.255118e+00  1.248247e+00  1.078599e-02  7.623147e-03
+  0.1666  1.248850e+00  1.250526e+00  1.124007e-02  7.995795e-03
+  0.1805  1.251271e+00  1.253572e+00  1.175556e-02  8.345022e-03
+  0.1944  1.254337e+00  1.255093e+00  1.222729e-02  8.644810e-03
+  0.2082  1.248639e+00  1.254186e+00  1.258846e-02  8.906934e-03
+  0.2221  1.254244e+00  1.251859e+00  1.300359e-02  9.177606e-03
+  0.2360  1.254148e+00  1.250234e+00  1.344233e-02  9.482834e-03
+  0.2499  1.251001e+00  1.251005e+00  1.386632e-02  9.801195e-03
+  0.2638  1.257670e+00  1.254010e+00  1.427039e-02  1.009353e-02
+  0.2777  1.254827e+00  1.257546e+00  1.457286e-02  1.034989e-02
+  0.2915  1.255058e+00  1.259661e+00  1.492969e-02  1.058840e-02
+  0.3054  1.260463e+00  1.259488e+00  1.536678e-02  1.082817e-02
+  0.3193  1.256208e+00  1.257919e+00  1.571769e-02  1.107893e-02
+  0.3332  1.259361e+00  1.256771e+00  1.604164e-02  1.134042e-02
+  0.3471  1.261891e+00  1.257424e+00  1.635221e-02  1.160018e-02
+  0.3610  1.257872e+00  1.259811e+00  1.667587e-02  1.183565e-02
+  0.3748  1.262437e+00  1.262418e+00  1.707149e-02  1.204123e-02
+  0.3887  1.261641e+00  1.263600e+00  1.737142e-02  1.224223e-02
+  0.4026  1.259133e+00  1.262772e+00  1.760819e-02  1.246572e-02
+  0.4165  1.263287e+00  1.260706e+00  1.792022e-02  1.270241e-02
+  0.4304  1.259992e+00  1.258926e+00  1.823520e-02  1.291931e-02
+  0.4443  1.259550e+00  1.258504e+00  1.855398e-02  1.310565e-02
+  0.4581  1.261923e+00  1.259376e+00  1.882636e-02  1.328192e-02
+  0.4720  1.257668e+00  1.260466e+00  1.902919e-02  1.346836e-02
+  0.4859  1.258906e+00  1.260486e+00  1.931677e-02  1.366416e-02
+  0.4998  1.258940e+00  1.258993e+00  1.962167e-02  1.386254e-02
+  0.5137  1.255272e+00  1.256679e+00  1.985920e-02  1.405766e-02
+  0.5275  1.257297e+00  1.254750e+00  2.009584e-02  1.423575e-02
+  0.5414  1.255488e+00  1.253996e+00  2.032065e-02  1.438673e-02
