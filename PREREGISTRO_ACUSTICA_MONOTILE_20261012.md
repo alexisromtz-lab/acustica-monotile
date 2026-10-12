@@ -212,3 +212,50 @@ UNIVERSO DECLARADO: las 4 corridas de un crudo; MOTOR = `python3 -B sim/sim_acus
 
 - Gate A2.1 sobre esta tupla: `TARGET` = este archivo, `BLOB_PRE = 5753f973608d41d60e5d269275e5b06891ce97bf`, `LINEAS_PRE = 163`, huella `Adenda de Retractación y Asiento de Solver` (la cabecera sin su nivel markdown) ⇒ **RC 0** a las `16:13:50Z`.
 - Escritura única y aditiva; §0–§9 intactos. Post-verificación (líneas, bytes, blob, `^#+`, `§7`) en el cuerpo del commit.
+
+## §7.8. Adenda de Definición: Nulo Decisivo Acústico U2 (Teselas Barajadas, K variable, rho=1)
+
+UNIVERSO DECLARADO: comandos `git hash-object` y `wc` sobre `sim/sim_acustica2d.py` (v3, blob `c7688c7dbdeccd49`, commit `bb1177b`) mas lectura de `malla_hat.py` de la casa vecina `fotonica-monotile` (l.2, l.663, l.890) · unidad = celda / semilla / ventana espectral · ventana = 2026-10-12T16:52:16Z, medida al escribir · motor = el solver commiteado, sin editar.
+
+### §7.8.1 Objeto fisico: por que el nulo va sobre la POSICION y no sobre el empalme
+
+El nulo de este frente es U2_ac: la **misma malla** de inclusiones (mismas teselas, mismo numero, misma fraccion de llenado) con **posiciones y orientaciones barajadas**. Lo que se anula es la **estructura**, no el material: las piezas son las mismas, su arreglo no.
+
+El empalme Z-acoplado (rho distinto de 1.0) queda **descartado**, y no por conveniencia:
+
+(a) exigiria abrir el solver commiteado para violar su propio `assert INV_MU == 1.0 and bool(np.all(inv_eps == K))`;
+(b) rompe el **isomorfismo con `fotonica-monotile`**, donde las teselas son dielectricas puras (eps en {1, 4} sobre mu = 1) y por eso las reflexiones de Fresnel son **no adaptadas** (Z distinto de 1). Un empalme adaptado mediria otro objeto fisico y destruiria la comparabilidad espectral entre ambos frentes.
+
+Declarado una sola vez: **rho se queda en 1.0; esta casa no tiene empalme Z-acoplado.**
+
+### §7.8.2 Regimen numerico del acto
+
+| parametro | valor | de donde sale |
+|---|---|---|
+| K_mat sobre K_0 = 1.0 | 0.25 | constante del solver commiteado (`K_MAT=0.25`) |
+| c_s = sqrt(K) | 0.5 | consecuencia del mapeo Caso B, no eleccion |
+| f (fraccion de llenado) nominal | 0.403833 | **cifra de la orden del dueno, no re-medida aqui**; su comando seria `python3 malla_hat.py` (casa vecina), que la imprime en l.890 |
+| tolerancia de f | 8.077e-3 | idem: de la orden, no re-medida |
+| N_semillas | 5 | tiradas independientes barajadas |
+| ventana espectral nu | [0.15, 0.55] en unidades de c_s/a | la ventana ya usada por C1 |
+
+### §7.8.3 Criterio de decision falsable
+
+```
+abs( T_U1(nu) - media_de_T_U2(nu) )  >  3 * sigma_U2(nu)  +  riz(T)_C1
+```
+
+con riz(T)_C1 = 0.005523 (§7.7.a.3, medido en C1b 24a, commit `d5a7548`). Si la diferencia **cae dentro** del umbral, se registra **NULO**: no se baja el umbral, no se cambia la ventana, no se cambia el numero de semillas.
+
+### §7.8.4 Lo que esta adenda NO dice
+
+- no corre U1 ni U2_ac: los define;
+- no toca rho ni una linea del solver;
+- no re-calibra los prestados Q1 a Q4 (0.50 / 0.05 / 0.05) de la casa vecina;
+- no adjudica el crecimiento de `cola_dominio` con la longitud del dominio, ni el maximo de C1b 36a en el borde externo de la PML.
+
+### §7.8.5 Bitacora de esta adenda
+
+Tupla A2.1: TARGET = `PREREGISTRO_ACUSTICA_MONOTILE_20261012.md` · BLOB_PRE = `4f9d9dc9f5cf66ab49d68671d62e7e2be201b7d4` · LINEAS_PRE = 214 · HUELLA = la cabecera de este bloque, con su nivel markdown y su numero, sin hora.
+
+Gate de pre-vuelo RC 0. Escritura unica y aditiva al final del archivo. Post-gate RC 11 (huella presente: cero escrituras sobre el estado ya escrito). La hora UTC real de ejecucion viaja en la linea UNIVERSO DECLARADO de esta adenda; no es un relleno de la orden.
