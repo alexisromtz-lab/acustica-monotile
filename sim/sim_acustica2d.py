@@ -270,9 +270,11 @@ def correr(L_a: float, modo: str) -> dict:
             px[1:, 1:] = (ax_e[1:, None] * px[1:, 1:]
                           - bx_e[1:, None] * inv_eps[1:, 1:]
                           * ((vx[1:, 1:] - vx[:-1, 1:]) / DX))
+            # CORREGIDO v3: el termino en y usaba vy[:, :-1] (fila completa) y
+            # rompia la forma (nx-1,ny-1) contra (nx,ny-1); el vecino usa hx[1:, :-1].
             py[1:, 1:] = (ay_e[None, 1:] * py[1:, 1:]
                           - by_e[None, 1:] * inv_eps[1:, 1:]
-                          * ((vy[1:, 1:] - vy[:, :-1]) / DY))
+                          * ((vy[1:, 1:] - vy[1:, :-1]) / DY))
         px[I_FUENTE, jc] += fuente(t)
         p = px + py
         s[0][n] = p[idx[0], jc]
