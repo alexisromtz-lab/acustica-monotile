@@ -117,6 +117,19 @@ y redondeado es `0.983140`.
 
 ---
 
+<!-- HUELLA-A21-STANDARD-README-ACUSTICA-20261013 -->
+
+## Epistemology & Rigor (The A2.1 Standard)
+
+> This repository operates under strict pre-registration. No parameters are tuned to fit the data post-execution. Analytical predictions (such as the 3σ bounding for stochastic noise) are sealed before running. Red/Null results are preserved and declared, guaranteeing immunity to confirmation bias and making the code entirely verifiable by both human auditors and AI agents.
+
+Los tres axiomas del estándar, cada uno con su anclaje medido en esta casa:
+
+1. **Predicción antes del motor.** El pre-registro (`PREREGISTRO_ACUSTICA_MONOTILE_20261012.md`, blob `075a05b425e182cf9f5a54edbc86af60e9e13f85`) se declara `SELLADO ANTES de la primera corrida del solver acústico de esta casa` (l.5): los umbrales son anteriores a la salida, no se eligen mirándola.
+2. **El rojo se conserva para poder volver a medirlo.** La primera versión del instrumento salió `ROJO` (`RC=2`) por defectos **de ella misma**, y su crudo vive en el repositorio: `crudos/isomorfismo_20261012T070415Z.txt` (veredicto en `crudos/isomorfismo_20261012T070415Z.json:106`). Sin esa foto, el rojo no se podría volver a medir (`PREREGISTRO_ACUSTICA_MONOTILE_20261012.md:137–142`).
+3. **Anclaje sin institución.** Sello Zenodo `10.5281/zenodo.23329941` (concepto `…23329940`), geometría `b498fcf`, crudo C1 `d5a7548`, crudo del enlace `03edabb` y etiqueta de reposo `v0.1.0` (`0b39c72`): identidad y re-ejecutabilidad verificables por cualquiera —persona o agente— sin institución en medio. El anclaje no certifica corrección: certifica identidad y re-ejecutabilidad.
+
+
 ## Cómo citar (BibTeX)
 
 ```bibtex
