@@ -1,0 +1,36 @@
+# acustica-monotile — Citación canónica (CITATION.cff, esquema CFF 1.2.0).
+#
+# Por qué existe. Sin metadatos legibles por máquina, un recolector automático
+# —Zenodo incluido— toma el LOGIN de la cuenta como autor. Este archivo declara
+# la autoría física, alineada con la identidad que el propio commit firma.
+#
+# Dos lecciones ya pagadas, aplicadas aquí:
+#   (1) `license` viaja como CADENA ESCALAR. En el repositorio hermano
+#       `protocol-core` este campo se puso en LISTA para que el DOI naciera dual,
+#       y el lector de Zenodo rechazó el paquete entero con `Not a valid string.`
+#   (2) `version` y `date-released` van entre comillas: el cargador YAML los
+#       convertiría en número y en fecha, y el esquema los pide como cadena.
+#
+# Este archivo no contiene ningún signo monetario, y se lo nombra en vez de
+# citarlo: un signo monetario es un patrón para quien edite por sustitución, no
+# un carácter. No se declara ORCID: no existe ninguno en este ecosistema.
+cff-version: 1.2.0
+message: "Si usa este software, sus crudos o su geometría, cite el artefacto como se indica."
+title: "acustica-monotile: enlace experimental fotónica → acústica sobre la geometría Monotile Hat (Paso 3)"
+abstract: "Instrumentos y crudos del enlace fotónica → acústica sobre la geometría del monotilo Hat: la malla dieléctrica del vecino fotonica-monotile se rasteriza a una máscara binaria y se inyecta como heterogeneidad constitutiva K(x, y) en un solver acústico 2D, que compara el vector de transmisión T(nu) de la geometría con máscara contra el mismo solver sin máscara (control nulo homogéneo). Resultado sellado sobre 29 bins de frecuencia (nu = 0.152711 a 0.541432 c/a): 7 DISCREPA y 22 NULO. Control de no-regresión bit a bit sobre el camino homogéneo C1 (array_equal verdadero, max_abs_dif = 0.0 en los 29 bins), con el piso del instrumento medido en su propia configuración homogénea (0.00552322568652841) y no heredado por prosa. Se imprimen dos denominadores del llenado y el par de control ddof = 0 al lado del ddof = 1; ninguno se elige después de ver la salida. Se publica el resultado negativo como resultado."
+version: "0.1.0"
+date-released: "2026-10-12"
+authors:
+  - family-names: "Roman Martinez"
+    given-names: "Jose Alexis"
+    alias: "alexisromtz"
+    affiliation: "alexisromtz-lab"
+license: MIT
+keywords:
+  - "monotile Hat"
+  - "aperiodicidad"
+  - "FDTD"
+  - "metrología A2.1"
+  - "enlace fotónica-acústica"
+  - "control de no-regresión bit a bit"
+repository-code: "https://github.com/alexisromtz-lab/acustica-monotile"

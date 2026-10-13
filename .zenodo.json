@@ -1,0 +1,31 @@
+{
+  "title": "acustica-monotile: enlace experimental fotónica → acústica sobre la geometría Monotile Hat (Paso 3)",
+  "description": "<p>Instrumentos y crudos del <strong>enlace fotónica → acústica</strong> sobre la geometría del monotilo Hat. La malla dieléctrica del repositorio vecino <em>fotonica-monotile</em> se rasteriza a una máscara binaria y se inyecta como heterogeneidad constitutiva <code>K(x, y)</code> en un solver acústico 2D; el vector de transmisión <code>T(nu)</code> de la geometría con máscara se compara contra el mismo solver sin máscara (control nulo homogéneo).</p><p><strong>Resultado sellado</strong> sobre 29 bins de frecuencia (<code>nu = 0.152711 … 0.541432</code> c/a): <strong>7 DISCREPA / 22 NULO</strong>. Eje del veredicto por bin: <code>abs(T_U1 − media_T_U2) − (3 · sigma_U2 + 0.005523)</code>.</p><p><strong>Control de no-regresión bit a bit</strong> sobre el camino homogéneo C1: <code>array_equal = True</code> y <code>max_abs_dif = 0.0</code> en los 29 bins. El piso usado en el umbral es el <em>piso medido por el propio instrumento</em> en su configuración homogénea (<code>0.00552322568652841</code>), no un número heredado por prosa.</p><p><strong>Declarado y no adjudicado</strong>: dos denominadores separados del llenado (analítico y por celdas cubiertas); el par de control <code>ddof = 0</code> impreso al lado del <code>ddof = 1</code> pre-declarado; el defecto de ruta de lectura de <code>celda</code> (no hay conversión declarada entre «unidad» y <code>a</code>); y las hipótesis de causalidad en baja frecuencia y de <em>aliasing</em> de borde, que quedan como hipótesis. Se publica el resultado negativo como resultado, no como fracaso.</p>",
+  "creators": [
+    {
+      "name": "Roman Martinez, Jose Alexis",
+      "affiliation": "alexisromtz-lab"
+    }
+  ],
+  "keywords": [
+    "monotile Hat",
+    "aperiodicidad",
+    "FDTD",
+    "metrología A2.1",
+    "enlace fotónica-acústica",
+    "control de no-regresión bit a bit"
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "access_right": "open",
+  "publication_date": "2026-10-12",
+  "version": "0.1.0",
+  "language": "spa",
+  "related_identifiers": [
+    {
+      "relation": "isDerivedFrom",
+      "identifier": "https://github.com/alexisromtz-lab/fotonica-monotile",
+      "scheme": "url"
+    }
+  ]
+}
