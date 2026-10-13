@@ -130,3 +130,71 @@ sim/                                                       solver, driver del en
 
 Repositorio hermano: [`alexisromtz-lab/fotonica-monotile`](https://github.com/alexisromtz-lab/fotonica-monotile)
 (origen de la geometría y de la malla dieléctrica).
+
+---
+
+## 9. Fe de erratas e incidencias conocidas
+
+Esta sección es **aditiva**. El acta de cierre
+(`ACTA_DE_CIERRE_DEL_ENLACE_ACUSTICA_FOTONICA_20261012.md`, blob `c10d5efba6920a192f890b75fc48effdf1c97054`)
+y el preregistro (`PREREGISTRO_ACUSTICA_MONOTILE_20261012.md`, blob `075a05b425e182cf9f5a54edbc86af60e9e13f85`)
+son **inmutables** y **no** se editan: lo que sigue es la fe de erratas del paquete.
+
+### 9.1 Errata de plantilla (preregistro, adenda 7.7.a)
+
+El preregistro §7.7.a nombra la plantilla `fdtd2m_tm.py`. **El nombre real es
+`fdtd2d_tm.py`** (blob `0d7820a8ea566e403e9528f30945a4a04ff9cbc4`, repositorio hermano
+`alexisromtz-lab/fotonica-monotile`). El error está en el nombre citado, no en el blob
+ni en la medición.
+
+### 9.2 Valor complementario re-derivado del crudo congelado (sin corridas nuevas)
+
+El criterio del preregistro §7.8 se re-deriva **únicamente** del crudo ya congelado
+(`crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json`, commit `03edabb`), sin
+reejecutar el solucionador y sin disparar el arnés de pre-escritura: el resultado es
+**7 `DISCREPA` / 22 `NULO`**, que **coincide** con los campos `n_discrepa` / `n_nulo`
+del propio crudo; el control de convención `ddof = 0` re-deriva **8** y coincide con
+`control_ddof0_n_discrepa = 8`.
+
+Descomposición del umbral (medida sobre el mismo crudo): la aportación del piso es
+`piso / umbral_max = 1.27687e-03` y la de `3 sigma_U2` cae en `[0.983139, 0.998723]`
+=> **el nulo es una cota acotada a su propio denominador** (`3 sigma_U2 + piso`),
+dominada por la fluctuación estadística del empaquetamiento aleatorio, no por el piso
+instrumental. Se **declara**; no se adjudica.
+
+### 9.3 Contraste `C2`: declarado, **no** derivable de lo congelado
+
+`C2` exige un medio **homogéneo** con `K: 1 -> 0.25`. Medido en el crudo
+`crudos/crudo_C1_acustica_20261012T072953Z.json` (commit `d5a7548`): el campo
+`reparto_constitutivo` trae `K_mat_declarado_no_usado = 0.25` — **declarado y no
+usado** — y las **4** corridas son todas homogéneas con `K_0 = 1.0`. No existe en Git
+ninguna corrida con `K != 1` => **`C2` no se puede derivar**: queda **pendiente
+declarado** con su condición de entrada (una corrida nueva de medio homogéneo con
+`K = 0.25`, `R = -1/3`, `T_amp = 2/3`). **No se ejecuta.**
+
+### 9.4 Advertencia de uso del arnés: camino de lectura de `celda`
+
+El driver del enlace lee la escala declarada de la malla bajo custodia desde una clave
+**raíz** que no existe en el crudo de `u1`; por eso el crudo del enlace imprime
+`escala_declarada = {'celda_unidades_vecino': None}`. La clave real está **anidada**: en
+`data/geometria_hat/u1/crudo.json`, `u1.celda = 0.45782072127145995` y
+`u1.lado = 175.80315696824061`.
+
+**Advertencia para replicaciones externas de `v0.1.0`**: no debe leerse un factor de
+conversión de la raíz del crudo de `u1`; el mapeo del enlace es **celda a celda sobre la
+ventana completa**, y la equivalencia `unidad <-> a` **no está declarada**. Esta sección
+**extiende** lo ya dicho en §5 de este README; no lo repite ni lo corrige. El código de
+`sim/` **no se modifica** en `v0.1.0`: el acta sellada certifica el árbol bajo el control
+C1 bit a bit.
+
+### 9.5 Sendero futuro declarado
+
+El veredicto cierra **este** enlace, no el transporte en aperiodicidad. Se declaran dos
+vías: **Cambio de Objeto** (cuasicristales de Penrose y teselados octogonales
+Ammann-Beenker, evaluando si una aperiodicidad con simetrías rotacionales prohibidas de
+5 u 8 pliegues abate el ruido de dispersión transversal) y **Cambio de Operador**
+(resonadores puntuales en los vértices del Hat monotile; el mecanismo pasa de
+interferencia destructiva por aperiodicidad pura a apertura de bandgap por hibridación
+resonante local, lo que constituye un **objeto físico nuevo** con su propia formulación
+analítica y pre-registro independiente). Detalle en
+`CIERRE_SENDERO_FUTURO_Y_ERRATA_DOCUMENTADA_20261013.md`.
