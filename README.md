@@ -1,4 +1,32 @@
+<!-- HUELLA-README-ACUSTICA-MONOTILE-20261013 -->
+
 # acustica-monotile — Enlace fotónica → acústica sobre la geometría Monotile Hat
+
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23329941-blue)](https://doi.org/10.5281/zenodo.23329941)
+[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-green)](LICENSE)
+[![Motor](https://img.shields.io/badge/motor-Python%203.14%20%C2%B7%20numpy%202.4.6-blue)](crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json)
+[![Control C1 bit a bit](https://img.shields.io/badge/C1%20bit--a--bit-PASA-brightgreen)](ACTA_DE_CIERRE_DEL_ENLACE_ACUSTICA_FOTONICA_20261012.md)
+[![Orden del esquema Yee](https://img.shields.io/badge/Yee-p%20%3D%202-blueviolet)](WHITEPAPER_ESQUELETO_20261013.md)
+
+**Gancho.** Solver acústico 2D que evalúa el transporte de ondas y las cotas de *bandgap* sobre
+el monotilo aperiódico de Hat, y que **publica un resultado negativo como resultado, no como
+fracaso**: sobre **29 bins** de frecuencia, el vector `T(nu)` con la máscara del monotilo **no**
+se separa de su control nulo homogéneo en **22 de 29** bins, y el nulo es una **cota**
+(`3 · sigma_U2 + piso`), no una igualdad. Cada cifra de este README viaja con su artefacto
+sellado, y cada tabla dice con qué comando se obtiene.
+
+*Dual 2D Yee-FDTD solver evaluating wave transport and bandgap bounds on the aperiodic
+Einstein Hat monotile. Null-bounded verdict over 29 frequency bins, sealed raw artifacts, and a
+bit-to-bit non-regression control.*
+
+**Nota sobre las insignias.** Cada insignia cita su artefacto, y dos de ellas declaran su
+límite. La de **motor** cita el campo de firma del crudo sellado (`python3 -B` + numpy 2.4.6
+sobre Python 3.14.7): es lo **medido**, no una promesa de compatibilidad con otras versiones. La
+de **orden del esquema** (`p = 2`) es el orden **declarado** del esquema Yee en
+`WHITEPAPER_ESQUELETO_20261013.md` §III, **no** una escalera de convergencia medida: en este
+repositorio no existe ninguna corrida que refine la malla y mida el exponente. Se escribe
+`p = 2`, nunca `p = 2.0001`.
+
 
 Instrumentos y crudos del **Paso 3 del enlace**: la malla dieléctrica del monotilo
 Hat, generada en el repositorio vecino `fotonica-monotile`, se rasteriza a una
@@ -7,6 +35,109 @@ solver acústico 2D. El vector de transmisión `T(nu)` de la geometría **con**
 máscara se compara contra el mismo solver **sin** máscara (control nulo homogéneo).
 
 Este repositorio publica **un resultado negativo como resultado**, no como fracaso.
+
+---
+
+## Inicio rápido (15 s)
+
+Sin dependencias: el bloque de abajo usa sólo la biblioteca estándar de Python (`json`). No
+requiere numpy, no escribe nada y **re-deriva el veredicto desde el crudo sellado**.
+
+```sh
+git clone https://github.com/alexisromtz-lab/acustica-monotile.git
+cd acustica-monotile
+python3 -B - <<'PY'
+import json
+d = json.load(open('crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json'))
+f = d['declarado_antes_de_medir']          # la regla, escrita ANTES de ver una cifra
+dd = [abs(a - b) - (f['factor'] * s + f['piso_medido_C1'])
+      for a, b, s in zip(d['T_U1'], d['media_T_U2'], d['sigma_U2_ddof1'])]
+print('DISCREPA=%d  NULO=%d  bins=%d'
+      % (sum(x > 0 for x in dd), sum(x <= 0 for x in dd), len(dd)))
+PY
+```
+
+Salida observada (`python3 -B`, 2026-10-13) — reproduce el veredicto sellado:
+
+```text
+DISCREPA=7  NULO=22  bins=29
+```
+
+El mismo bloque, extendido con `print(d['n_discrepa'], d['n_nulo'])`, imprime `7 22`: **el
+veredicto re-derivado coincide con los campos del propio crudo**
+(`derivado_igual_al_campo=True`), y las clases presentes son exactamente `DISCREPA` y `NULO`.
+
+**Reproducción completa** (la corrida real del enlace, no la lectura del crudo):
+
+```sh
+python3 -B sim/driver_enlace_fotonica_acustica.py
+```
+
+El driver **no toma argumentos**; resuelve `sim/` por `__file__` y escribe un crudo **nuevo**,
+etiquetado con la hora UTC de la corrida, en `crudos/` — es decir, **no sobrescribe el crudo
+sellado**. Requiere numpy, y no es una corrida de segundos.
+
+---
+
+## Resultados medidos
+
+Tabla metrológica, descompuesta. **Universo declarado: el crudo sellado**
+`crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json` (26 278 B, commit `03edabb`),
+ventana `2026-10-12T20:47:13Z → 20:48:09Z`, unidad = **valor de `T` por bin** (29 bins; 1
+realización = 1 corrida), 6 corridas, todas heterogéneas, con `K ∈ [0.25, 1.00]`. El veredicto
+asentado está en §1; esta tabla lo **descompone**, no lo repite.
+
+| Cantidad | Valor medido | Cómo se obtiene |
+| --- | --- | --- |
+| Vector oficial | **29 bins**, `nu = 0.1527114967462039 → 0.5414316702819957` (c/a) | `len(d['nu'])`, `d['nu'][0]`, `d['nu'][-1]` |
+| Veredicto | **7 `DISCREPA` / 22 `NULO`** | re-derivado `= 7/22` **y** campo `n_discrepa/n_nulo = 7/22` |
+| `delta_T` máximo | `1.5697403560585752` en `nu = 0.4859002169197397` | `max(d['delta_T'])` |
+| `delta_T` mínimo (el más negativo) | `-3.805628370974314` en `nu = 0.5414316702819957` | `min(d['delta_T'])` |
+| Rango de `T_U2` en ese mismo bin | `rango_T_U2_max = 3.4677075111160995` | se **imprimen los dos**; ninguno se elige ni se adjudica |
+| `sigma_U2` (`ddof = 1`) | `[0.107349341659, 1.440029667278]` | `min/max(d['sigma_U2_ddof1'])` |
+| Banda del nulo | `[0.327571024978, 4.325612001835]` = `3 · sigma_U2 + 0.00552322568652841` | `min/max(d['umbral'])` |
+| Reparto del nulo | `3 sigma_U2 / banda ∈ [0.983139534395, 0.998723186454]` · `piso / banda_max = 1.276865720778e-03` | `3*s/u` y `piso/max(umbral)` bin a bin |
+| Llenado: **dos denominadores, no fusionables** | `suma_areas_analitico = 0.4038327588420457` · `cobertura_union_U1 = 0.4036797417534722 = media_mascara_binaria` | `d['llenado_dos_denominadores']`; no se elige |
+| Control de convención (`ddof = 0`) | **8** `DISCREPA` | `control_ddof0_n_discrepa` |
+| Control del piso (`piso_medido_C1`) | **7** `DISCREPA` | `control_piso_medido_n_discrepa` (igual que el nominal: el piso no cambia el veredicto) |
+| Control de ejes (máscaras sin transponer) | **11** `DISCREPA` | `control_convencion['n_discrepa']` — mide que la convención **no es un no-op**; **no es un veredicto** |
+| `nu` idéntico en todas las corridas | `True` | `nu_iguales_en_todas_las_corridas` |
+| No-regresión **C1 bit a bit** | `array_equal = True` · `max_abs_dif = 0.0` sobre los 29 bins | acta de cierre §4 (l.150–151) |
+
+Lectura del reparto, **dentro de lo medido**: el nulo es una cota acotada a su propio
+denominador (`3 sigma_U2 + piso`) y está dominada por `3 sigma_U2`, que aporta de
+`0.983139534395` a `0.998723186454` de la banda; el piso instrumental aporta
+`1.276865720778e-03` de la banda máxima. Lo que **no** dice: que exista un mecanismo de
+transporte. Eso queda declarado abajo, sin adjudicar.
+
+Nota de no-deriva: §9.2 imprime la misma participación **a 6 decimales** (`[0.983139,
+0.998723]`) y el mismo piso normalizado (`1.27687e-03`). Son las **mismas** cifras con otra
+anchura de impresión, no dos mediciones: `0.983139534395` truncado a 6 decimales es `0.983139`
+y redondeado es `0.983140`.
+
+---
+
+## Cómo citar (BibTeX)
+
+```bibtex
+@software{roman_martinez_acustica_monotile_2026,
+  author    = {Roman Martinez, Jose Alexis},
+  title     = {acustica-monotile: enlace experimental fotónica → acústica sobre la geometría Monotile Hat (Paso 3)},
+  year      = {2026},
+  version   = {0.1.0},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.23329941},
+  url       = {https://doi.org/10.5281/zenodo.23329941},
+  license   = {MIT},
+  keywords  = {monotile Hat, aperiodicidad, FDTD, metrología A2.1, enlace fotónica-acústica, no-regresión bit a bit}
+}
+```
+
+**No se declara ORCID**: el propio `CITATION.cff` lo dice — no existe ninguno en este
+ecosistema, y el bloque de arriba no lleva ese campo. El formulario canónico de cita es
+`CITATION.cff` (esquema CFF 1.2.0); los metadatos de depósito viven en `.zenodo.json`. El DOI de
+la **versión** es el de la insignia; el del **concepto** (todas las versiones) es
+`10.5281/zenodo.23329940`.
 
 ---
 
