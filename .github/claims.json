@@ -1,0 +1,31 @@
+{
+  "huella": "HUELLA-CLAIMS-ACUSTICA-MONOTILE-20261020",
+  "repo": "acustica-monotile",
+  "clase": "A",
+  "claims": [
+    {
+      "id": "DISCREPA",
+      "afirma": "DISCREPA=7",
+      "dato": "crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json",
+      "deriva": "count(dato.veredicto_por_bin, 'DISCREPA')",
+      "polaridad": "exacto",
+      "prosa": "README.md"
+    },
+    {
+      "id": "NULO",
+      "afirma": "NULO=22",
+      "dato": "crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json",
+      "deriva": "count(dato.veredicto_por_bin, 'NULO')",
+      "polaridad": "exacto",
+      "prosa": "README.md"
+    },
+    {
+      "id": "BINS",
+      "afirma": "bins=29",
+      "dato": "crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json",
+      "deriva": "len(dato.veredicto_por_bin)",
+      "polaridad": "exacto",
+      "prosa": "README.md"
+    }
+  ]
+}
