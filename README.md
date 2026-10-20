@@ -219,12 +219,17 @@ máscara** (`C1b`, `L = 24.0 a`) se compara contra el crudo `C1` sellado
 | `array_equal` | **`True`** |
 | `max_abs_dif` | **`0.0`** (bit a bit) |
 | `piso_medido_C1` del crudo `C1` | `0.00552322568652841` |
-| `T_riz` usado en el umbral del enlace | `0.0055232256865284102` |
+| `piso` **usado** en el umbral nominal | `0.005523` (`piso_contrato`, pre-declarado) |
+| `piso` medido, como **par de control** | `0.00552322568652841` ⇒ `control_piso_medido_n_discrepa = 7` |
 
-El piso **no es un número heredado por prosa**: `T_riz` **es exactamente** el
-`piso_medido_C1` del propio instrumento en su configuración homogénea. (Nota de nombre,
-ya pagada: la cifra `0.004258596071401777` **no** es un `riz` — su casa medida es
-`T_desv_max` / `T_desv_max_por_modo`, la **desviación máxima de `T`**, otra cantidad.)
+El piso **no** es un número heredado por prosa: el que el umbral **usa** es `0.005523`, el
+contrato pre-declarado del Paso 3, que es el **redondeo a 6 decimales** del
+`piso_medido_C1` (`0.00552322568652841`) del propio instrumento en su configuración
+homogénea; el medido entra como **par de control** y **no mueve el veredicto** (7 con
+ambos). Discrepan en `2.2568e-07`, por debajo del último decimal del contrato: manda el
+contrato, y así se dice desde §9.6. (Nota de nombre, ya pagada: la cifra
+`0.004258596071401777` **no** es un `riz` — su casa medida es `T_desv_max` /
+`T_desv_max_por_modo`, la **desviación máxima de `T`**, otra cantidad.)
 
 ---
 
@@ -342,3 +347,31 @@ interferencia destructiva por aperiodicidad pura a apertura de bandgap por hibri
 resonante local, lo que constituye un **objeto físico nuevo** con su propia formulación
 analítica y pre-registro independiente). Detalle en
 `CIERRE_SENDERO_FUTURO_Y_ERRATA_DOCUMENTADA_20261013.md`.
+
+### 9.6 Errata de exactitud: qué `piso` usa el umbral del enlace
+<!-- HUELLA-ACUSTICA-README-PISO-CONTRATO-20261020 -->
+
+El acta de cierre (l.162, **inmutable**) dice que `T_riz = 0.0055232256865284102`
+«es exactamente» el `piso_medido_C1` que el crudo del enlace usa en su umbral. Medido
+sobre el crudo sellado (`03edabb`, 29 bins), la segunda mitad es **falsa por
+`2.2568652857657412e-07`**:
+
+| Identidad medida sobre los 29 bins | Residuo máximo |
+| --- | --- |
+| `umbral == 3 · sigma_U2_ddof1 + 0.005523` (`piso_contrato`) | `0.0` |
+| `umbral == 3 · sigma_U2_ddof1 + 0.00552322568652841` (`piso_medido_C1`) | `2.2568652857657412e-07` |
+
+El nominal **usa el contrato** pre-declarado (`PISO_CONTRATO = 0.005523`, en
+`sim/driver_enlace_fotonica_acustica.py` l.55 y l.177); el medido entra como **par de
+control** (l.179) y arroja el **mismo veredicto**: `control_piso_medido_n_discrepa = 7`.
+El contrato es el **redondeo a 6 decimales** del medido (`round(0.00552322568652841, 6)
+== 0.005523`), de modo que las cifras de §1 («… + `0.005523`») y de §4 quedan como
+estaban en la parte que importa: lo que manda es el contrato.
+
+**No se re-sella nada**: el veredicto `7 / 22` es **invariante** al piso; lo que se
+corrige es la prosa, no la medición, y el acta y el preregistro **no se editan**. El
+mismo error de redacción viaja en el `abstract` de `CITATION.cff` y en la `description`
+de `.zenodo.json`, que son los metadatos del depósito **ya publicado** (`v0.1.0`): no se
+reescriben aquí, se declaran aquí.
+
+Guardia: `tests/test_cifras_publicadas.py::test_el_umbral_usa_el_piso_del_contrato`.
