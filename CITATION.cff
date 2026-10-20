@@ -20,6 +20,7 @@ title: "acustica-monotile: enlace experimental fotónica → acústica sobre la 
 abstract: "Instrumentos y crudos del enlace fotónica → acústica sobre la geometría del monotilo Hat: la malla dieléctrica del vecino fotonica-monotile se rasteriza a una máscara binaria y se inyecta como heterogeneidad constitutiva K(x, y) en un solver acústico 2D, que compara el vector de transmisión T(nu) de la geometría con máscara contra el mismo solver sin máscara (control nulo homogéneo). Resultado sellado sobre 29 bins de frecuencia (nu = 0.152711 a 0.541432 c/a): 7 DISCREPA y 22 NULO. Control de no-regresión bit a bit sobre el camino homogéneo C1 (array_equal verdadero, max_abs_dif = 0.0 en los 29 bins), con el piso del instrumento medido en su propia configuración homogénea (0.00552322568652841) y no heredado por prosa. Se imprimen dos denominadores del llenado y el par de control ddof = 0 al lado del ddof = 1; ninguno se elige después de ver la salida. Se publica el resultado negativo como resultado."
 version: "0.1.0"
 date-released: "2026-10-12"
+doi: "10.5281/zenodo.23329941"  # HUELLA-CITATION-DOI-ACUSTICA-20261020
 authors:
   - family-names: "Roman Martinez"
     given-names: "Jose Alexis"
