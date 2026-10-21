@@ -2,6 +2,9 @@
   "huella": "HUELLA-CLAIMS-ACUSTICA-MONOTILE-20261020",
   "repo": "acustica-monotile",
   "clase": "A",
+  "datos": {
+    "crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json": "d1ca06d7c6a06867"
+  },
   "claims": [
     {
       "id": "DISCREPA",
