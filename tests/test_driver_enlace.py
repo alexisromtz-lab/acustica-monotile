@@ -1,5 +1,6 @@
 # HUELLA-EJECUTOR-DRIVER-ENLACE-20261020
 # HUELLA-EJECUTOR-DRIVER-ENLACE-BORDE-EXACTO-20261021
+# HUELLA-EJECUTOR-DRIVER-ENLACE-TOLERANCIA-REPRODUCIBLE-20261021
 """Ejecutor del driver del enlace fotonica -> acustica — acustica-monotile.
 
 `sim/driver_enlace_fotonica_acustica.py` (352 l.) era el ultimo inerte de
@@ -75,6 +76,11 @@ CRUDOS = RAIZ / "crudos"
 CRUDO_ENLACE = CRUDOS / "crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json"
 CRUDO_C1 = CRUDOS / "crudo_C1_acustica_20261012T072953Z.json"
 BINS = 29
+
+# Reproduccion del crudo publicado entre maquinas: macOS/arm64 da 0.0 y el
+# runner Linux dio 7.105e-15 (run 39556291717). 1e-12 queda nueve ordenes por
+# debajo del bin mas fino (5.113e-3) y no puede mover un veredicto.
+TOL_REPRODUCCION = 1e-12
 
 
 def _enlace() -> dict:
@@ -234,19 +240,42 @@ def test_abre_no_inventa_llaves() -> None:
 # ----------------------------------------- el solver, corrido de verdad ---
 
 
-def test_corre_u1_reproduce_el_crudo_bit_a_bit() -> None:
+def test_corre_u1_reproduce_el_crudo_dentro_de_la_tolerancia_declarada() -> None:
+    """Reproduccion del crudo publicado, con la tolerancia declarada y defendida.
+
+    ERRATA MEDIDA en CI (`39556291717`, runner Linux): la version anterior
+    aserto `np.array_equal` — "bit a bit" — y paso en macOS/arm64 con
+    max|dT| = 0.0, pero en el runner dio max|dT| = 7.105e-15. El "bit a bit"
+    no era propiedad del objeto: era propiedad de esta maquina. La suma de
+    float64 cambia de orden con el BLAS y el kernel, y el crudo se imprimio con
+    otra de esas sumas.
+
+    Lo que si es propiedad del objeto y se puede exigir en cualquier maquina:
+    la reproduccion cae orders de magnitud por debajo de la resolucion del
+    veredicto. `TOL_REPRODUCCION` se declara y se defiende contra esa
+    resolucion: el bin mas cercano a cero del crudo esta a 5.113e-3, el piso a
+    5.523e-3, y la tolerancia es 1e-12 — nueve ordenes por debajo del bin mas
+    fino. No puede mover un solo veredicto.
+    """
     e = _enlace()
     r = driver.corre("u1", True)
     T = np.asarray(r["T"], dtype=np.float64)
+    publicado = np.asarray(e["T_U1"], dtype=np.float64)
+    desvio = float(np.max(np.abs(T - publicado)))
+
+    assert TOL_REPRODUCCION * 1e9 < driver.PISO_CONTRATO
+    assert TOL_REPRODUCCION < float(np.min(np.abs(np.asarray(e["delta_T"]))))
+    assert desvio <= TOL_REPRODUCCION, (
+        "el solver dejo de reproducir la corrida publicada: max|dT| = %r sobre "
+        "una tolerancia declarada de %r (macOS/arm64 midio 0.0; el runner Linux "
+        "de 39556291717 midio 7.105e-15)" % (desvio, TOL_REPRODUCCION)
+    )
+
     assert r["nt"] == 2304
     assert r["es_heterogeneo"] is True
     assert r["identidad_inv_eps_igual_a_K"] is True
     assert r["identidad_inv_mu_igual_a_uno"] is True
-    assert np.array_equal(T, np.asarray(e["T_U1"], dtype=np.float64)), (
-        "el solver dejo de reproducir la corrida publicada: %r vs %r"
-        % (float(np.max(np.abs(T - np.asarray(e["T_U1"])))), e["T_U1"][:3])
-    )
-    assert r["T_media"] == e["corridas"][0]["T_media"]
+    assert abs(r["T_media"] - e["corridas"][0]["T_media"]) <= TOL_REPRODUCCION
     assert r["K_min"] == e["corridas"][0]["K_min"] == 0.25
     assert r["K_max"] == e["corridas"][0]["K_max"] == 1.0
 
