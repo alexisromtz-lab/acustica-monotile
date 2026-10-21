@@ -2,5 +2,6 @@
 # Contrato v5: comando: + mide:, con la evidencia que el runner declara.
 # El comando conserva la cadena medida en este repo (manifiesto y despues pytest):
 # si el manifiesto revienta, el rc corta antes de correr los tests.
-comando: python .github/verify_manifest.py && python -m pytest -q tests
+comando: python .github/verify_manifest.py && python -m pytest -q tests --junitxml=/tmp/junit.xml
 mide: tests
+evidencia: junitxml
