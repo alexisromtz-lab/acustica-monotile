@@ -8,6 +8,7 @@
       "afirma": "DISCREPA=7",
       "dato": "crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json",
       "deriva": "count(dato.veredicto_por_bin, 'DISCREPA')",
+      "modo": "derivacion",
       "polaridad": "exacto",
       "prosa": "README.md"
     },
@@ -16,6 +17,7 @@
       "afirma": "NULO=22",
       "dato": "crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json",
       "deriva": "count(dato.veredicto_por_bin, 'NULO')",
+      "modo": "derivacion",
       "polaridad": "exacto",
       "prosa": "README.md"
     },
@@ -24,6 +26,7 @@
       "afirma": "bins=29",
       "dato": "crudos/crudo_ENLACE_ACUSTICA_FOTONICA_20261012T204809Z.json",
       "deriva": "len(dato.veredicto_por_bin)",
+      "modo": "derivacion",
       "polaridad": "exacto",
       "prosa": "README.md"
     }
