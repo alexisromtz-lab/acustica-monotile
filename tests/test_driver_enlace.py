@@ -1,4 +1,5 @@
 # HUELLA-EJECUTOR-DRIVER-ENLACE-20261020
+# HUELLA-EJECUTOR-DRIVER-ENLACE-BORDE-EXACTO-20261021
 """Ejecutor del driver del enlace fotonica -> acustica — acustica-monotile.
 
 `sim/driver_enlace_fotonica_acustica.py` (352 l.) era el ultimo inerte de
@@ -39,7 +40,13 @@ Falsadores declarados (lo que pone rojo a este test):
   1. numpy ausente -> este modulo lo importa en su cabecera y el driver lo
      necesita para correr: la coleccion levanta `ModuleNotFoundError`.
   2. la desigualdad del veredicto deja de ser estricta (`delta >= 0` en vez de
-     `delta > 0`) -> test 4 cae en el caso frontera `delta == 0`.
+     `delta > 0`) -> cae `test_el_borde_exacto_mata_la_desigualdad_no_estricta`.
+     ERRATA MEDIDA: la primera version de este ejecutor declaraba que el caso
+     frontera de `test_veredicto_se_apaga_con_un_control_que_no_discrimina`
+     ya cubria este mutante, y era falso: con cinco copias desplazadas `sigma`
+     sale -5.55e-17 y `delta` cae en -5.55e-17, negativo tambien para `>= 0.0`,
+     asi que el mutante sobrevivia con 11 verdes. El borde solo muerde donde
+     `delta` es 0.0 **exacto**, y eso exige `T` constante y piso 0.
   3. el veredicto se apaga con un control que no discrimina (todos los bins
      `NULO`) -> test 4 cae.
   4. el solver cambia y `T_U1` deja de reproducir el crudo -> test 7 cae.
@@ -180,6 +187,33 @@ def test_veredicto_se_apaga_con_un_control_que_no_discrimina() -> None:
     )
     assert np.all(v3["delta_T"] <= 0.0)
     assert v3["n_discrepa"] == 0, "DeltaT = 0 no es DISCREPA: la desigualdad es estricta"
+
+
+def test_el_borde_exacto_mata_la_desigualdad_no_estricta() -> None:
+    """El borde donde `delta` cae en `0.0` exacto, sin redondeo de la media.
+
+    El caso frontera del test anterior desplaza las cinco copias de `U2` por el
+    piso, y ahi la media deja un artefacto: `sigma` sale -5.55e-17 y `delta`
+    cae en -5.55e-17, negativo tambien bajo `>= 0.0`. Con `T` constante y piso 0
+    no hay desplazamiento que redondear: `U2 - media` es 0.0 exacto, `sigma` es
+    0.0 exacto y `delta` es 0.0 exacto. Es el unico punto donde `> 0.0` y
+    `>= 0.0` dan distinto, y por eso el unico que mata el mutante.
+    """
+    constante = np.full(BINS, 1.0)
+    U2 = np.vstack([constante.copy() for _ in range(5)])
+
+    v = driver.veredicto(constante, U2, 0.0, driver.DDQF)
+    assert np.all(v["sigma_U2"] == 0.0)
+    assert np.all(v["delta_T"] == 0.0), (
+        "el borde tiene que ser 0.0 exacto: %r no es el punto donde la "
+        "desigualdad estricta se distingue de la no estricta"
+        % (sorted(set(v["delta_T"].tolist()))[:3],)
+    )
+    assert v["n_bins"] == BINS
+    assert v["n_discrepa"] == 0, (
+        "DeltaT = 0.0 exacto no es DISCREPA: si aqui DISCREPA, la desigualdad "
+        "se volvio no estricta y los 29 bins del borde firman de mas"
+    )
 
 
 def test_vector_apila_una_fila_por_realizacion() -> None:
