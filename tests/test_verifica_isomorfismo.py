@@ -16,9 +16,10 @@ mide el caso feliz no distingue un verificador de un adorno.
 Desviaciones medidas contra la orden que autorizo este acto (la orden no se
 reescribe, se corrige con el numero delante):
 
-  1. RUTA: la orden apuntaba a `platino-labs/sim/tests/test_verifica_isomorfismo.py`.
-     `platino-labs` no tiene `sim/tests/` y su CI no corre pytest: el ejecutor
-     vive donde vive el objeto (`acustica-monotile/tests/`), o no ejecuta nada.
+  1. RUTA: la orden apuntaba a un `sim/tests/test_verifica_isomorfismo.py` del
+     corpus de custodia. Ese corpus no tiene `sim/tests/` y su CI no corre
+     pytest: el ejecutor vive donde vive el objeto
+     (`acustica-monotile/tests/`), o no ejecuta nada.
   2. MALFORMADO: la orden esperaba `RC 2` para una entrada malformada. El
      contrato real del objeto es `ValueError` en `alfa_de_fila` y en
      `residuo_del_mapeo` (falla cerrado por excepcion, no por codigo de salida).

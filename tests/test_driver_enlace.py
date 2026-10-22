@@ -23,11 +23,11 @@ Contrato MEDIDO del objeto (no el supuesto):
 Desviaciones declaradas contra la orden que autorizo este acto (la orden no se
 reescribe, se corrige con el numero delante):
 
-  1. RUTA: la orden apuntaba a `platino-labs/sim/tests/`, que no existe y no
-     corre pytest. El ejecutor vive donde vive el objeto y donde hay pytest:
-     `acustica-monotile/tests/`. La medicion de acoplamiento (D13) da **cero
-     copias**: `platino-labs/sim/` no tiene `verifica_isomorfismo.py` ni este
-     driver; no hay fork ni dependencia cross-repo que declarar.
+  1. RUTA: la orden apuntaba a un `sim/tests/` del corpus de custodia, que no
+     existe y no corre pytest. El ejecutor vive donde vive el objeto y donde hay
+     pytest: `acustica-monotile/tests/`. La medicion de acoplamiento (D13) da
+     **cero copias**: el corpus de custodia no tiene `verifica_isomorfismo.py` ni
+     este driver; no hay fork ni dependencia cross-repo que declarar.
   2. `RC != 0` EN EL CASO SIN PAR: la orden pedia un codigo distinto de cero.
      El contrato medido no tiene codigos: `main()` firma 0 y el par ausente
      levanta `SystemExit` con `.code` de tipo str. Se exige el contrato medido.
