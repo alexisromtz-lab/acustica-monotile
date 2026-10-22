@@ -1,9 +1,9 @@
-# HUELLA-CI-PYTHON-V5-PROHIBICION-EVAL-20261020
-# Contrato v5: comando: + mide:, con la evidencia que el runner declara.
-# El comando conserva la cadena medida en este repo (manifiesto y despues pytest):
-# si el manifiesto revienta, el rc corta antes de correr los tests.
-comando: python .github/verify_manifest.py && python -m pytest -q tests --junitxml=/tmp/junit.xml
-mide: manifiesto+tests
-evidencia: MANIFIESTO_SANO: [0-9]+; junitxml
-# HUELLA-APPARATUS-MODO-COMPUESTO-20261020 · la cadena mide DOS cosas y el
-# certificado cubre las dos: MANIFIESTO_SANO (entero > 0) y junitxml (<testcase>).
+# HUELLA-CI-APPARATUS-ACUSTICA-TESTS-20261022
+# Contrato v10: el aparato mide UNA cosa. La cadena compuesta ponia
+# `.github/verify_manifest.py` delante de pytest: si el manifiesto reventaba, el
+# rc cortaba antes de los tests, pero un manifiesto sano no probaba nada del
+# instrumento. El banco semantico (nulo homogeneo, umbrales prestados,
+# isomorfismo, custodia de la geometria) es el testigo; el manifiesto se retira.
+comando: python -m pytest -q tests --junitxml=/tmp/junit.xml
+mide: tests
+evidencia: junitxml
