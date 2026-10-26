@@ -24,6 +24,7 @@ doi: "10.5281/zenodo.23329941"  # HUELLA-CITATION-DOI-ACUSTICA-20261020
 authors:
   - family-names: "Roman Martinez"
     given-names: "Jose Alexis"
+    orcid: "https://orcid.org/0009-0001-9116-075X"
     alias: "alexisromtz"
     affiliation: "alexisromtz-lab"
 license: MIT
